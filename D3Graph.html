@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bar Chart</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .bar {
+      fill: steelblue;
+      transition: fill 0.3s ease;
+    }
+
+    .bar:hover {
+      fill: orange;
+    }
+
+    .axis text {
+      font-size: 12px;
+    }
+
+    .axis .tick line {
+      stroke: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <svg id="chart"></svg>
+
+  <script>
+    // Sample data
+    const data = [
+      { label: "A", value: 20 },
+      { label: "B", value: 35 },
+      { label: "C", value: 10 },
+      { label: "D", value: 15 },
+      { label: "E", value: 25 }
+    ];
+
+    // Chart dimensions
+    const width = 500;
+    const height = 300;
+    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+
+    // Create SVG element
+    const svg = d3.select("#chart")
+                  .attr("width", width)
+                  .attr("height", height);
+
+    // Create chart container
+    const chart = svg.append("g")
+                      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Define scales
+    const xScale = d3.scaleBand()
+                     .range([0, chartWidth])
+                     .padding(0.1)
+                     .domain(data.map(d => d.label));
+
+    const yScale = d3.scaleLinear()
+                     .range([chartHeight, 0])
+                     .domain([0, d3.max(data, d => d.value)]);
+
+    // Create bars
+    const bars = chart.selectAll(".bar")
+                      .data(data)
+                      .enter()
+                      .append("rect")
+                      .attr("class", "bar")
+                      .attr("x", d => xScale(d.label))
+                      .attr("y", d => yScale(d.value))
+                      .attr("width", xScale.bandwidth())
+                      .attr("height", d => chartHeight - yScale(d.value));
+
+    // Create x-axis
+    const xAxis = d3.axisBottom(xScale);
+    chart.append("g")
+         .attr("class", "x-axis")
+         .attr("transform", `translate(0, ${chartHeight})`)
+         .call(xAxis)
+         .selectAll("text")
+         .attr("transform", "rotate(-45)")
+         .style("text-anchor", "end");
+
+    // Create y-axis
+    const yAxis = d3.axisLeft(yScale);
+    chart.append("g")
+         .attr("class", "y-axis")
+         .call(yAxis);
+
+  </script>
+</body>
+</html>
